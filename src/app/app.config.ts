@@ -7,6 +7,7 @@ import { PreloadAllModules, provideRouter, withInMemoryScrolling, withPreloading
 import { appRoutes } from './app.routes';
 import {provideMain} from "./main.provider";
 import {mockApiServices} from "./mock-api/futures";
+import {provideIcons} from "./utils/icons/icons.provider";
 
 
 export const appConfig: ApplicationConfig = {
@@ -37,6 +38,7 @@ export const appConfig: ApplicationConfig = {
                 },
             },
         },
+      provideIcons(),
       provideMain({
         mockApi: {
           delay   : 0,

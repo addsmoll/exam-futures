@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-
 import { futures as futuresData } from './data';
 import { cloneDeep } from 'lodash-es';
 import {MockApiService} from '../mock-api.service';
@@ -28,7 +27,7 @@ export class FuturesMockApi
     registerHandlers(): void
     {
         // -----------------------------------------------------------------------------------------------------
-        // @ Crypto - GET
+        // @ Sales - GET
         // -----------------------------------------------------------------------------------------------------
         this._mockApiService
             .onGet('api/futures')
