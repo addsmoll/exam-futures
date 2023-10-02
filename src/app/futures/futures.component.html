@@ -1,0 +1,143 @@
+
+4
+<!-- Buy / Sell -->
+<div class="flex flex-col flex-auto shrink-0 pt-6 bg-gray-50 dark:bg-transparent">
+
+  <!-- Action -->
+  <div class="flex flex-col px-6 pb-2">
+    <mat-form-field>
+      <mat-label>Action</mat-label>
+      <mat-icon
+        class="icon-size-5"
+        [svgIcon]="buySellSelect.value === 'buy' ? 'heroicons_solid:arrow-down-tray' : 'heroicons_solid:arrow-up-tray'"
+        matPrefix></mat-icon>
+      <mat-select
+        [value]="'buy'"
+        #buySellSelect="matSelect">
+        <mat-option [value]="'buy'">Buy</mat-option>
+        <mat-option [value]="'sell'">Sell</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <!-- Wallet -->
+  <div class="flex flex-col px-6 pb-2">
+    <mat-form-field class="w-full">
+      <mat-label>Wallet</mat-label>
+      <mat-select
+        [value]="'btc'"
+        #walletSelector="matSelect">
+        <mat-select-trigger>
+                                    <span class="flex items-center">
+                                        <span>{{walletSelector.triggerValue}}</span>
+                                        <span class="mx-1 text-hint">-</span>
+                                        <span class="flex items-center font-mono">
+<!--                                            <span>{{data.wallets[walletSelector.value]}}</span>-->
+<!--                                            <span class="ml-1">{{walletSelector.value | uppercase}}</span>-->
+                                        </span>
+                                    </span>
+        </mat-select-trigger>
+        <mat-option [value]="'btc'">Bitcoin</mat-option>
+        <mat-option [value]="'eth'">Ethereum</mat-option>
+        <mat-option [value]="'bch'">Bitcoin Cash</mat-option>
+        <mat-option [value]="'xrp'">XRP</mat-option>
+      </mat-select>
+      <mat-hint class="flex items-center">
+        <span class="mr-1">USD:</span>
+<!--        <span class="font-mono font-medium text-normal">-->
+<!--                                    {{data.wallets[walletSelector.value] * data.prices[walletSelector.value] | currency:'USD'}}-->
+<!--                                </span>-->
+      </mat-hint>
+    </mat-form-field>
+  </div>
+
+  <!-- Buy form -->
+  <form
+    class="flex flex-col px-6"
+    *ngIf="buySellSelect.value === 'buy'">
+    <mat-form-field class="w-full">
+      <mat-label>Amount</mat-label>
+      <input
+        matInput
+        autocomplete="off"
+        #buyAmount>
+      <mat-select
+        [value]="'coin'"
+        matSuffix
+        #buyType="matSelect">
+        <mat-option [value]="'coin'">{{walletSelector.value | uppercase}}</mat-option>
+        <mat-option [value]="'usd'">USD</mat-option>
+      </mat-select>
+      <span
+        matPrefix
+        *ngIf="buyType.value === 'usd'">
+                                $
+                            </span>
+      <mat-hint class="flex items-center">
+        <ng-container *ngIf="buyType.value === 'coin'">
+          <span class="mr-1">It will cost:</span>
+<!--          <span class="font-mono font-medium text-normal">-->
+<!--                                        {{buyAmount.value * data.prices[walletSelector.value] | currency:'USD':'symbol':'1.2-4'}}-->
+<!--                                    </span>-->
+        </ng-container>
+        <ng-container *ngIf="buyType.value === 'usd'">
+          <span class="mr-1">You will receive:</span>
+<!--          <span class="font-mono font-medium text-normal">-->
+<!--                                        {{buyAmount.value / data.prices[walletSelector.value] | number:'1.2-6'}} {{walletSelector.value | uppercase}}-->
+<!--                                    </span>-->
+        </ng-container>
+      </mat-hint>
+    </mat-form-field>
+    <button
+      class="mt-4 mb-8"
+      mat-flat-button
+      [color]="'primary'">
+      BUY
+    </button>
+  </form>
+
+  <!-- Sell form -->
+  <form
+    class="flex flex-col px-6"
+    *ngIf="buySellSelect.value === 'sell'">
+    <mat-form-field class="w-full">
+      <mat-label>Amount</mat-label>
+      <input
+        matInput
+        autocomplete="off"
+        #sellAmount>
+      <mat-select
+        [value]="'coin'"
+        matSuffix
+        #sellType="matSelect">
+        <mat-option [value]="'coin'">{{walletSelector.value | uppercase}}</mat-option>
+        <mat-option [value]="'usd'">USD</mat-option>
+      </mat-select>
+      <span
+        matPrefix
+        *ngIf="sellType.value === 'usd'">
+                                $
+                            </span>
+      <mat-hint class="flex items-center">
+        <ng-container *ngIf="sellType.value === 'coin'">
+          <span class="mr-1">You will receive:</span>
+<!--          <span class="font-mono font-medium text-normal">-->
+<!--                                        {{sellAmount.value * data.prices[walletSelector.value] | currency:'USD':'symbol':'1.2-4'}}-->
+<!--                                    </span>-->
+        </ng-container>
+        <ng-container *ngIf="sellType.value === 'usd'">
+          <span class="mr-1">You will sell:</span>
+<!--          <span class="font-mono font-medium text-normal">-->
+<!--                                        {{sellAmount.value / data.prices[walletSelector.value] | number:'1.2-6'}} {{walletSelector.value | uppercase}}-->
+<!--                                    </span>-->
+        </ng-container>
+      </mat-hint>
+    </mat-form-field>
+    <button
+      class="mt-4 mb-8"
+      mat-flat-button
+      [color]="'primary'">
+      SELL
+    </button>
+  </form>
+</div>
