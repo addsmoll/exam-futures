@@ -1,8 +1,6 @@
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { APP_INITIALIZER, EnvironmentProviders, Provider } from '@angular/core';
+import { EnvironmentProviders, Provider } from '@angular/core';
 import { MATERIAL_SANITY_CHECKS } from '@angular/material/core';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
-import {MOCK_API_DEFAULT_DELAY, mockApiInterceptor} from "./mock-api";
 
 export type MainProviderConfig = {
     mockApi?: {
@@ -34,28 +32,9 @@ export const provideMain = (config: MainProviderConfig): Array<Provider | Enviro
                 appearance: 'fill',
             },
         },
-        {
-            provide : MOCK_API_DEFAULT_DELAY,
-            useValue: config?.mockApi?.delay ?? 0,
-        },
-
-        // provideHttpClient(withInterceptors([loadingInterceptor])),
 
     ];
 
-    // Mock Api services
-    if ( config?.mockApi?.services )
-    {
-        providers.push(
-            provideHttpClient(withInterceptors([mockApiInterceptor])),
-            {
-                provide   : APP_INITIALIZER,
-                deps      : [...config.mockApi.services],
-                useFactory: () => (): any => null,
-                multi     : true,
-            },
-        );
-    }
 
     // Return the providers
     return providers;

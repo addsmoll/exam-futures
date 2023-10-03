@@ -8,7 +8,6 @@ export class FakeDbService implements InMemoryDbService
     {
         return {
            'futures': FuturesFakeDb.futures,
-
         };
     }
 }

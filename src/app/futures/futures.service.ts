@@ -27,6 +27,8 @@ export class FuturesService
         return this._data.asObservable();
     }
 
+
+
     // -----------------------------------------------------------------------------------------------------
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
@@ -45,11 +47,21 @@ export class FuturesService
     }
 
   /**
+   * Get data
+   */
+  setData(data): Observable<any>
+  {
+   this._data.next(data);
+    return this._data.asObservable();
+
+  }
+
+  /**
    * ChangeSeries
    * This method just create new item into Futures Array
    */
   changeSeries(rangeValue: number) {
-    return this._httpClient.post('api/futures/range', JSON.stringify(new Futures(rangeValue))).pipe(
+    return this._httpClient.post('api/futures', JSON.stringify(new Futures(rangeValue))).pipe(
       tap((response: any) =>
       {
         this._data.next(response);
@@ -58,11 +70,11 @@ export class FuturesService
   }
 
   /**
-   * Patch data
+   * ChangeSeries
+   * This method upgrading futures array
    */
-  fetchData(date: string): Observable<any>
-  {
-    return this._httpClient.post('api/futures', {date: date}).pipe(
+  saveNewArr(array) {
+    return this._httpClient.post('api/futures', array).pipe(
       tap((response: any) =>
       {
         this._data.next(response);
@@ -70,18 +82,7 @@ export class FuturesService
     );
   }
 
-  /**
-   * Patch data
-   */
-  patchData(): Observable<any>
-  {
-    return this._httpClient.post('api/futures', {}).pipe(
-      tap((response: any) =>
-      {
-        this._data.next(response);
-      }),
-    );
-  }
+
 
   /**
    * Generates a random id
