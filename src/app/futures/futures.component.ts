@@ -28,7 +28,6 @@ import {Router} from "@angular/router";
 import {IRange} from "./range.interface";
 import {IFutures} from "./futures.interface";
 import {Futures} from "./futures";
-import {data} from "autoprefixer";
 
 @Component({
     selector       : 'app-futures',
@@ -43,7 +42,7 @@ export class FuturesComponent implements OnInit, OnDestroy
 {
   percentOfChange: number;
   trend: 'up' | 'down' = 'down';
-  currentSeriesValue: number = 100;
+  currentSeriesValue: number = 97;
   currentSeries: IRange =  { label:'5 min', value: 99 }
   currentFutures: IFutures;
   allFutures: IFutures[] = [];
@@ -83,31 +82,30 @@ export class FuturesComponent implements OnInit, OnDestroy
     ngOnInit(): void
     {
 
-
-/*      this.timer5Sec
-        .pipe(takeUntil(this._unsubscribeAll))
-        .subscribe(val => {
-        this.timer = val;
-
-        this._futuresService.getData()
-          .pipe(takeUntil(this._unsubscribeAll)).subscribe((res) => {
-          // console.log('In Memory', res)
-        } )
-
-      })*/
+      // this.timer5Sec
+      //   .pipe(
+      //     mergeMap(() => {
+      //      return this._futuresService.getData()
+      //     })
+      //   )
+      //   .subscribe(val => {
+      //
+      //
+      // })
 
       this.timer5Min
         .pipe(
         mergeMap(() => {
-          const newArr = [...this.allFutures, new Futures(this.currentSeriesValue+1)]
+          let newArr = [...this.allFutures, new Futures(this.currentSeriesValue+1)]
+          if(this.allFutures.length > 30){
+            newArr = [new Futures(this.currentSeriesValue+1)]
+          }
           return this._futuresService.saveNewArr(newArr);
 
         }),
-        )
-        .subscribe(val => {
-
-          console.log('val', val);
-        })
+        ).subscribe(() => {
+          this.currentSeriesValue = this.currentSeriesValue+1
+      })
 
         // Get the data
         this._futuresService.data$
@@ -115,8 +113,8 @@ export class FuturesComponent implements OnInit, OnDestroy
             .subscribe((data) =>
             {
               this.allFutures = data;
-              console.log('newArr', data)
-              this.currentFutures = data.find(f => f.series === this.currentSeries.value)
+              this.currentFutures = data.find(f => f.series === this.currentSeriesValue)
+              console.log('cf', this.currentFutures);
             });
     }
 
