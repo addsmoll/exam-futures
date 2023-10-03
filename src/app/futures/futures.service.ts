@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import {BehaviorSubject, map, Observable, tap} from 'rxjs';
 import {Futures} from "./futures";
 
 @Injectable({providedIn: 'root'})
@@ -46,6 +46,15 @@ export class FuturesService
         );
     }
 
+    getFromFuturesStore(nextSeries: number) {
+      return this._httpClient.get('api/futures-store').pipe(
+        map(() =>
+        {
+          return new Futures(nextSeries)
+        }),
+      );
+    }
+
   /**
    * Get data
    */
@@ -60,8 +69,8 @@ export class FuturesService
    * ChangeSeries
    * This method just create new item into Futures Array
    */
-  changeSeries(rangeValue: number) {
-    return this._httpClient.post('api/futures', JSON.stringify(new Futures(rangeValue))).pipe(
+  saveItem(mItem) {
+    return this._httpClient.put('api/futures', mItem).pipe(
       tap((response: any) =>
       {
         this._data.next(response);

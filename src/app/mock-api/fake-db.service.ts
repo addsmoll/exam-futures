@@ -7,7 +7,8 @@ export class FakeDbService implements InMemoryDbService
     createDb(): any
     {
         return {
-           'futures': FuturesFakeDb.futures,
+           'futures': FuturesFakeDb.stack,
+           'futures-store': FuturesFakeDb.store,
         };
     }
 }

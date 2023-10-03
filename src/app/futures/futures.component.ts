@@ -1,10 +1,19 @@
 import {CommonModule, CurrencyPipe, DecimalPipe, NgClass, NgFor, NgForOf, NgIf, UpperCasePipe} from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit,  ViewEncapsulation } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  OnDestroy,
+  OnInit,
+  signal,
+  ViewEncapsulation
+} from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
 import { ApexOptions, NgApexchartsModule } from 'ng-apexcharts';
 import {
+  catchError,
   concatMap,
   delay,
   interval,
@@ -28,6 +37,7 @@ import {Router} from "@angular/router";
 import {IRange} from "./range.interface";
 import {IFutures} from "./futures.interface";
 import {Futures} from "./futures";
+import {takeUntilDestroyed, toSignal} from "@angular/core/rxjs-interop";
 
 @Component({
     selector       : 'app-futures',
@@ -42,7 +52,7 @@ export class FuturesComponent implements OnInit, OnDestroy
 {
   percentOfChange: number;
   trend: 'up' | 'down' = 'down';
-  currentSeriesValue: number = 97;
+  currentSeriesValue: number = 99;
   currentSeries: IRange =  { label:'5 min', value: 99 }
   currentFutures: IFutures;
   allFutures: IFutures[] = [];
@@ -56,7 +66,7 @@ export class FuturesComponent implements OnInit, OnDestroy
   ]
   timer: number;
   timer5Sec = timer(1000, 1000); //  timer5Sec = timer(1000, 5000);
-  timer5Min = timer(1000, 5000); //  timer5Min = timer(1000, 300000);
+  timer5Min = timer(1000, 50000); //  timer5Min = timer(1000, 300000);
 
   private _unsubscribeAll: Subject<any> = new Subject<any>();
 
@@ -81,41 +91,60 @@ export class FuturesComponent implements OnInit, OnDestroy
      */
     ngOnInit(): void
     {
+      this.timer5Sec
+        .pipe(
+          mergeMap(() => {
+           return this._futuresService.getFromFuturesStore(this.currentSeriesValue) //we were taking new future object
+          }),
+          tap((newFutures) => {
+            if (this.currentFutures) {
+              if(this.currentSeriesValue === newFutures.series){
+                console.log('++!', newFutures.series, this.currentSeriesValue)
+                if ( newFutures.min < this.currentFutures?.min || newFutures.max > this.currentFutures?.max) {
+                  if (newFutures.min < this.currentFutures?.min) {
+                    this.currentFutures.min = newFutures.min
+                  }
+                  if (newFutures.max > this.currentFutures?.max) {
+                    this.currentFutures.min = newFutures.min
+                  }
+                  console.log('!', this.currentFutures)
+                  return  this._futuresService.saveItem(this.currentFutures)
+                }else {
+                  return of(false)
+                }
 
-      // this.timer5Sec
-      //   .pipe(
-      //     mergeMap(() => {
-      //      return this._futuresService.getData()
-      //     })
-      //   )
-      //   .subscribe(val => {
-      //
-      //
-      // })
+              }
+            }
+
+
+            return of(false)
+
+          })
+        )
+        .subscribe(data => {
+
+          console.log('data', data);
+
+
+           console.log('cf', this.currentFutures);
+
+      })
 
       this.timer5Min
         .pipe(
         mergeMap(() => {
           let newArr = [...this.allFutures, new Futures(this.currentSeriesValue+1)]
-          if(this.allFutures.length > 30){
-            newArr = [new Futures(this.currentSeriesValue+1)]
-          }
           return this._futuresService.saveNewArr(newArr);
-
         }),
-        ).subscribe(() => {
-          this.currentSeriesValue = this.currentSeriesValue+1
+          ).subscribe((data) => {
+        this.currentSeriesValue = this.currentSeriesValue+1
+        console.log('this.currentSeriesValue', this.currentSeriesValue);
+         this.currentFutures = data.find(f => f.series === this.currentSeriesValue)
+        this._changeDetectorRef.markForCheck()
+
       })
 
-        // Get the data
-        this._futuresService.data$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((data) =>
-            {
-              this.allFutures = data;
-              this.currentFutures = data.find(f => f.series === this.currentSeriesValue)
-              console.log('cf', this.currentFutures);
-            });
+
     }
 
   /**
