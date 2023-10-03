@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
+import {Futures} from "./futures";
 
 @Injectable({providedIn: 'root'})
 export class FuturesService
@@ -42,6 +43,32 @@ export class FuturesService
             }),
         );
     }
+
+  /**
+   * ChangeSeries
+   * This method just create new item into Futures Array
+   */
+  changeSeries(rangeValue: number) {
+    return this._httpClient.post('api/futures/range', JSON.stringify(new Futures(rangeValue))).pipe(
+      tap((response: any) =>
+      {
+        this._data.next(response);
+      }),
+    );
+  }
+
+  /**
+   * Patch data
+   */
+  fetchData(date: string): Observable<any>
+  {
+    return this._httpClient.post('api/futures', {date: date}).pipe(
+      tap((response: any) =>
+      {
+        this._data.next(response);
+      }),
+    );
+  }
 
   /**
    * Patch data

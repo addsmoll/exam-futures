@@ -1,5 +1,6 @@
 export interface IFutures {
-  value: number;
+  series: number;
+  min: number;
+  max: number;
   label: string;
-  date: string;
 }

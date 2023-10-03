@@ -32,7 +32,7 @@
           <button
             [matMenuTriggerFor]="actionsMenu"
             mat-icon-button>
-            <mat-icon [svgIcon]="'heroicons_outline:ellipsis-vertical'"></mat-icon>
+            <mat-icon [svgIcon]="'heroicons_solid:ellipsis-vertical'"></mat-icon>
           </button>
           <mat-menu #actionsMenu="matMenu">
             <button mat-menu-item>Export</button>
@@ -101,21 +101,25 @@
               class="h-6 min-h-6 px-2 rounded-full bg-hover"
               mat-button
               [matMenuTriggerFor]="conversionMenu">
-              <span class="font-medium text-sm text-secondary">30 days</span>
+              <span class="font-medium text-sm text-secondary">{{currentSeries.label}}</span>
             </button>
             <mat-menu #conversionMenu="matMenu">
-              <button mat-menu-item>30 days</button>
-              <button mat-menu-item>3 months</button>
-              <button mat-menu-item>9 months</button>
+              <button mat-menu-item *ngFor="let item of seriesRange" (click)="onSeriesRangeChange(item)">{{item.label}}</button>
+              <button mat-menu-item>15 min</button>
+
             </mat-menu>
           </div>
         </div>
-        <div class="flex flex-col lg:flex-row lg:items-center mx-6 mt-3">
-          <div class="text-7xl font-bold tracking-tighter leading-tight">{{data.conversions.amount | number:'1.0-0'}}</div>
+        <div class="flex flex-col lg:flex-row lg:items-center gap-4 mx-6 mt-3">
+          <div class="flex flex-col gap-4">
+            <div class="text-7xl font-bold tracking-tighter leading-tight">Min: {{data.conversions.amount | number:'1.0-0'}}</div>
+            <div class="text-7xl font-bold tracking-tighter leading-tight">Max: {{data.conversions.amount | number:'1.0-0'}}</div>
+          </div>
+
           <div class="flex lg:flex-col lg:ml-3">
             <mat-icon
               class="icon-size-5 text-red-500"
-              [svgIcon]="'heroicons_mini:arrow-trending-down'"></mat-icon>
+              [svgIcon]="'heroicons_solid:arrow-trending-down'"></mat-icon>
             <div class="flex items-center ml-1 lg:ml-0 lg:mt-0.5 text-md leading-none whitespace-nowrap text-secondary">
               <span class="font-medium text-red-500">2%</span>
               <span class="ml-1">below target</span>
@@ -134,90 +138,8 @@
             [yaxis]="chartConversions.yaxis"></apx-chart>
         </div>
       </div>
-      <!-- Impressions -->
-      <div class="flex flex-col flex-auto bg-card shadow rounded-2xl overflow-hidden">
-        <div class="flex items-start justify-between m-6 mb-0">
-          <div class="text-lg font-medium tracking-tight leading-6 truncate">Impressions</div>
-          <div class="ml-2">
-            <button
-              class="h-6 min-h-6 px-2 rounded-full bg-hover"
-              mat-button
-              [matMenuTriggerFor]="impressionsMenu">
-              <span class="font-medium text-sm text-secondary">30 days</span>
-            </button>
-            <mat-menu #impressionsMenu="matMenu">
-              <button mat-menu-item>30 days</button>
-              <button mat-menu-item>3 months</button>
-              <button mat-menu-item>9 months</button>
-            </mat-menu>
-          </div>
-        </div>
-        <div class="flex flex-col lg:flex-row lg:items-center mx-6 mt-3">
-          <div class="text-7xl font-bold tracking-tighter leading-tight">{{data.impressions.amount | number:'1.0-0'}}</div>
-          <div class="flex lg:flex-col lg:ml-3">
-            <mat-icon
-              class="icon-size-5 text-red-500"
-              [svgIcon]="'heroicons_mini:arrow-trending-down'"></mat-icon>
-            <div class="flex items-center ml-1 lg:ml-0 lg:mt-0.5 text-md leading-none whitespace-nowrap text-secondary">
-              <span class="font-medium text-red-500">4%</span>
-              <span class="ml-1">below target</span>
-            </div>
-          </div>
-        </div>
-        <div class="flex flex-col flex-auto h-20">
-          <apx-chart
-            class="flex-auto w-full h-full"
-            [chart]="chartImpressions.chart"
-            [colors]="chartImpressions.colors"
-            [series]="chartImpressions.series"
-            [stroke]="chartImpressions.stroke"
-            [tooltip]="chartImpressions.tooltip"
-            [xaxis]="chartImpressions.xaxis"
-            [yaxis]="chartImpressions.yaxis"></apx-chart>
-        </div>
-      </div>
-      <!-- Visits -->
-      <div class="flex flex-col flex-auto bg-card shadow rounded-2xl overflow-hidden">
-        <div class="flex items-start justify-between m-6 mb-0">
-          <div class="text-lg font-medium tracking-tight leading-6 truncate">Visits</div>
-          <div class="ml-2">
-            <button
-              class="h-6 min-h-6 px-2 rounded-full bg-hover"
-              mat-button
-              [matMenuTriggerFor]="impressionsMenu">
-              <span class="font-medium text-sm text-secondary">30 days</span>
-            </button>
-            <mat-menu #impressionsMenu="matMenu">
-              <button mat-menu-item>30 days</button>
-              <button mat-menu-item>3 months</button>
-              <button mat-menu-item>9 months</button>
-            </mat-menu>
-          </div>
-        </div>
-        <div class="flex flex-col lg:flex-row lg:items-center mx-6 mt-3">
-          <div class="text-7xl font-bold tracking-tighter leading-tight">{{data.visits.amount | number:'1.0-0'}}</div>
-          <div class="flex lg:flex-col lg:ml-3">
-            <mat-icon
-              class="icon-size-5 text-red-500"
-              [svgIcon]="'heroicons_mini:arrow-trending-down'"></mat-icon>
-            <div class="flex items-center ml-1 lg:ml-0 lg:mt-0.5 text-md leading-none whitespace-nowrap text-secondary">
-              <span class="font-medium text-red-500">4%</span>
-              <span class="ml-1">below target</span>
-            </div>
-          </div>
-        </div>
-        <div class="flex flex-col flex-auto h-20">
-          <apx-chart
-            class="flex-auto w-full h-full"
-            [chart]="chartVisits.chart"
-            [colors]="chartVisits.colors"
-            [series]="chartVisits.series"
-            [stroke]="chartVisits.stroke"
-            [tooltip]="chartVisits.tooltip"
-            [xaxis]="chartVisits.xaxis"
-            [yaxis]="chartVisits.yaxis"></apx-chart>
-        </div>
-      </div>
+
+
     </div>
 
     <!-- Visitors vs. Page Views -->
@@ -245,7 +167,7 @@
               <div class="font-medium text-secondary leading-5">Overall Score</div>
               <mat-icon
                 class="ml-1.5 icon-size-4 text-hint"
-                [svgIcon]="'heroicons_mini:information-circle'"
+                [svgIcon]="'heroicons_solid:information-circle'"
                 [matTooltip]="'Score is calculated by using the historical ratio between Page Views and Visitors. Best score is 1000, worst score is 0.'"></mat-icon>
             </div>
             <div class="flex items-start mt-2">
@@ -263,7 +185,7 @@
               <div class="font-medium text-secondary leading-5">Average Ratio</div>
               <mat-icon
                 class="ml-1.5 icon-size-4 text-hint"
-                [svgIcon]="'heroicons_mini:information-circle'"
+                [svgIcon]="'heroicons_solid:information-circle'"
                 [matTooltip]="'Average Ratio is the average ratio between Page Views and Visitors'"></mat-icon>
             </div>
             <div class="flex items-start mt-2">
@@ -281,7 +203,7 @@
               <div class="font-medium text-secondary leading-5">Predicted Ratio</div>
               <mat-icon
                 class="ml-1.5 icon-size-4 text-hint"
-                [svgIcon]="'heroicons_mini:information-circle'"
+                [svgIcon]="'heroicons_solid:information-circle'"
                 [matTooltip]="'Predicted Ratio is calculated by using historical ratio, current trends and your goal targets.'"></mat-icon>
             </div>
             <div class="flex items-start mt-2">

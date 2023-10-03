@@ -1,11 +1,16 @@
 import {IFutures} from "./futures.interface";
 
 export class Futures implements IFutures {
-  value: number;
+  series: number;
+  min: number;
+  max: number;
   label: string;
-  date: string;
-  constructor(futures?)
+  constructor(series)
   {
+    this.min = 0
+    this.max = 0
+    this.label = `Series:`+ series
+    this.series = series
   }
 
 }
