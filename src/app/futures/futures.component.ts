@@ -1,4 +1,4 @@
-import {CommonModule, CurrencyPipe, DecimalPipe, NgClass, NgFor, NgForOf, NgIf, UpperCasePipe} from '@angular/common';
+import {DecimalPipe, NgClass, NgFor, NgIf} from '@angular/common';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -11,14 +11,9 @@ import {
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 
-import {ApexOptions, NgApexchartsModule} from 'ng-apexcharts';
+import {NgApexchartsModule} from 'ng-apexcharts';
 import {
-  map,
-
   mergeMap,
-
-  of,
-
   Subject, takeUntil,
   tap,
   timer
@@ -31,8 +26,6 @@ import {Router} from "@angular/router";
 import {IRange} from "./range.interface";
 import {IResultSeries, ISeries} from "./series.interface";
 import {ResultSeries, Series} from "./series";
-import {takeUntilDestroyed, toSignal} from "@angular/core/rxjs-interop";
-
 import {MaxPipe, MinPipe} from "./min-max.pipe";
 
 @Component({
@@ -41,17 +34,18 @@ import {MaxPipe, MinPipe} from "./min-max.pipe";
     encapsulation  : ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone     : true,
-    imports        : [MatButtonModule, MatIconModule, MatMenuModule, MatButtonToggleModule, NgApexchartsModule, MatTooltipModule, NgFor, DecimalPipe, MinPipe, MaxPipe],
+    imports        : [MatButtonModule, MatIconModule, MatMenuModule, MatButtonToggleModule, NgApexchartsModule, MatTooltipModule, NgFor, NgIf, NgClass, DecimalPipe, MinPipe, MaxPipe],
 
 })
 export class FuturesComponent implements OnInit, OnDestroy
 {
 
   public resultSeries: IResultSeries;
-  percentOfChange: number;
+  percentOfChange: string;
   trend: 'up' | 'down' = 'down';
   currentSeries: ISeries;
   allSeries: ISeries[] = [];
+  currentFuturesAmount: number;
   seriesRange = [
     { label:'5 min', value: 1 },
     { label:'15 min', value: 3 },
@@ -60,8 +54,8 @@ export class FuturesComponent implements OnInit, OnDestroy
     { label:'4 h ', value: 48 }
   ]
   currentSeriesRange: IRange = this.seriesRange[0]
-  timer5Sec = timer(1000, 1000); //  timer5Sec = timer(1000, 5000);
-  timer5Min = timer(0, 5000); //  timer5Min = timer(1000, 300000);
+  timer5Sec = timer(1000, 5000);
+  timer5Min = timer(0, 300000);
 
   private _unsubscribeAll: Subject<any> = new Subject<any>();
 
@@ -84,7 +78,7 @@ export class FuturesComponent implements OnInit, OnDestroy
      */
     ngOnInit(): void
     {
-      this.currentSeries = new Series(99);
+      this.currentSeries = new Series(97);
       this.resultSeries = new ResultSeries();
 
       // Get the data
@@ -103,29 +97,31 @@ export class FuturesComponent implements OnInit, OnDestroy
            return this._futuresService.getFromFuturesStore() //We were taking new future object
           }),
           tap((newFutures) => {
-            console.log('resultSeries', this.resultSeries);
+            this.currentFuturesAmount = newFutures.value;
             if (this.resultSeries?.min){
               if (newFutures.value < this.resultSeries?.min) {
                 this.resultSeries.min = newFutures.value
                 this.currentSeries.min = newFutures.value
+                this.percentOfChange = Math.round((newFutures.value / this.currentSeries.min) * 100).toFixed(0);
+                this.trend = 'down'
               }
             }else {
               this.resultSeries.min = newFutures.value;
             }
                   if (newFutures.value > this.resultSeries?.max) {
+                    this.percentOfChange = Math.round((this.currentSeries.min /  newFutures.value) * 100).toFixed(0);
                     this.resultSeries.max = newFutures.value
                     this.currentSeries.max = newFutures.value
+                    this.trend = 'up'
                   }
                   this.currentSeries.values.push(newFutures);
+
                   this._changeDetectorRef.markForCheck()
                   return this._futuresService.saveItem(this.currentSeries)
 
           })
         )
-        .subscribe(data => {
-
-
-        })
+        .subscribe()
 
       //Launch and create first series object in db.
       this.timer5Min
