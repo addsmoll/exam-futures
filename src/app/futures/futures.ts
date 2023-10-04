@@ -1,18 +1,16 @@
-import {IFutures} from "./futures.interface";
+import { DateTime } from 'luxon';
 
-export class Futures implements IFutures {
+export class Futures {
   id: any;
-  series: number;
-  min: number;
-  max: number;
-  label: string;
-  constructor(series)
+  value: number;
+  date: DateTime;
+
+  constructor(value?: number)
   {
-    this.id = series+10;
-    this.min = +this.randomNumber(3)
-    this.max =  +this.randomNumber(4)
-    this.label = `Series:`+ series
-    this.series = series
+     this.id = this.randomNumber(8)
+     this.value = +this.randomNumber(value || 4)
+     this.date = DateTime.now(); /* Get the current instant */
+
   }
 
 

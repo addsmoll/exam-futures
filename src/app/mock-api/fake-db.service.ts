@@ -1,5 +1,5 @@
 import { InMemoryDbService } from 'angular-in-memory-web-api';
-import {FuturesFakeDb} from "./futures/store";
+import {FuturesFakeDb} from "./series";
 
 
 export class FakeDbService implements InMemoryDbService
@@ -7,8 +7,8 @@ export class FakeDbService implements InMemoryDbService
     createDb(): any
     {
         return {
-           'futures': FuturesFakeDb.stack,
-           'futures-store': FuturesFakeDb.store,
+           'series': FuturesFakeDb.series,
+           'futures': FuturesFakeDb.futures,
         };
     }
 }

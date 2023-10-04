@@ -1,16 +1,14 @@
 export class FuturesFakeDb
 {
-    public static store = [
+    public static futures = [
       {
-        id: 1,
-        series: 97,
-        value: 'initial: 97',
-        min: 580,
-        max: 6090
+        id: 4,
+        value: 0,
+
       },
     ];
 
-  public static stack = [
+  public static series = [
     {
       id: 1,
       series: 97,
@@ -26,7 +24,7 @@ export class FuturesFakeDb
       max: 8040
     },
     {
-      id: 1,
+      id: 3,
       series: 99,
       value: 'initial: 99',
       min: 2000,
