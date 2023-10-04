@@ -1,4 +1,4 @@
-import {ISeries} from "./series.interface";
+import {IResultSeries, ISeries} from "./series.interface";
 import {Futures} from "./futures";
 
 export class Series implements ISeries {
@@ -37,4 +37,14 @@ export class Series implements ISeries {
     return name;
   }
 
+}
+
+export class ResultSeries implements IResultSeries {
+  min: number;
+  max: number;
+
+  constructor() {
+    this.min = 0
+    this.max = null
+  }
 }

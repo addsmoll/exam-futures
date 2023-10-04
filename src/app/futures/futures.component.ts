@@ -13,6 +13,7 @@ import {MatIconModule} from '@angular/material/icon';
 
 import {ApexOptions, NgApexchartsModule} from 'ng-apexcharts';
 import {
+  map,
 
   mergeMap,
 
@@ -29,7 +30,7 @@ import {MatTooltipModule} from "@angular/material/tooltip";
 import {Router} from "@angular/router";
 import {IRange} from "./range.interface";
 import {IResultSeries, ISeries} from "./series.interface";
-import {Series} from "./series";
+import {ResultSeries, Series} from "./series";
 import {takeUntilDestroyed, toSignal} from "@angular/core/rxjs-interop";
 
 import {MaxPipe, MinPipe} from "./min-max.pipe";
@@ -45,11 +46,12 @@ import {MaxPipe, MinPipe} from "./min-max.pipe";
 })
 export class FuturesComponent implements OnInit, OnDestroy
 {
+
+  public resultSeries: IResultSeries;
   percentOfChange: number;
   trend: 'up' | 'down' = 'down';
   currentSeries: ISeries;
   allSeries: ISeries[] = [];
-  resultSeries: IResultSeries;
   seriesRange = [
     { label:'5 min', value: 1 },
     { label:'15 min', value: 3 },
@@ -83,6 +85,7 @@ export class FuturesComponent implements OnInit, OnDestroy
     ngOnInit(): void
     {
       this.currentSeries = new Series(99);
+      this.resultSeries = new ResultSeries();
 
       // Get the data
       this._futuresService.data$
@@ -91,7 +94,6 @@ export class FuturesComponent implements OnInit, OnDestroy
         {
           // Store the data
           this.allSeries = data;
-          console.log('allSeries', this.allSeries);
         });
 
       // Launch generation futures with static 5s interval.
@@ -101,33 +103,40 @@ export class FuturesComponent implements OnInit, OnDestroy
            return this._futuresService.getFromFuturesStore() //We were taking new future object
           }),
           tap((newFutures) => {
-                  if (newFutures.value < this.resultSeries?.min) {
-                    this.resultSeries.min = newFutures.value
-                    this.currentSeries.min = newFutures.value
-                  }
+            console.log('resultSeries', this.resultSeries);
+            if (this.resultSeries?.min){
+              if (newFutures.value < this.resultSeries?.min) {
+                this.resultSeries.min = newFutures.value
+                this.currentSeries.min = newFutures.value
+              }
+            }else {
+              this.resultSeries.min = newFutures.value;
+            }
                   if (newFutures.value > this.resultSeries?.max) {
-                    this.resultSeries.min = newFutures.value
-                    this.currentSeries.min = newFutures.value
+                    this.resultSeries.max = newFutures.value
+                    this.currentSeries.max = newFutures.value
                   }
                   this.currentSeries.values.push(newFutures);
+                  this._changeDetectorRef.markForCheck()
                   return this._futuresService.saveItem(this.currentSeries)
 
           })
         )
         .subscribe(data => {
-          this._changeDetectorRef.markForCheck()
+
+
         })
 
       //Launch and create first series object in db.
       this.timer5Min
         .pipe(
         mergeMap(() => {
-          let newArr = [...this.allSeries, new Series(this.currentSeries.series+1)]
+          this.currentSeries = new Series(this.currentSeries.series+1)
+          let newArr = [...this.allSeries, this.currentSeries]
           return this._futuresService.saveSeries(newArr);
         }),
           ).subscribe((data) => {
             this.calculateResultSeries(data)
-         this.currentSeries = data.find(f => f.series === this.currentSeries.series)
         this._changeDetectorRef.markForCheck()
 
       })
@@ -169,16 +178,15 @@ export class FuturesComponent implements OnInit, OnDestroy
     const sum = this.currentSeries.series-this.currentSeriesRange.value;
     const commonArr = []
     arr.forEach((e) => {
-      if(e.series > sum) {
+      if(e.series >= sum) {
         commonArr.push(e.max)
         commonArr.push(e.min)
       }
     })
-    console.log('resultSeries', this.resultSeries);
-    if (this.resultSeries) {
+
       this.resultSeries.min = Math.min(...commonArr);
       this.resultSeries.max = Math.max(...commonArr);
-    }
+
 
 
   }
